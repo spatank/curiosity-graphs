@@ -1,5 +1,3 @@
-
-
 @lru_cache(maxsize = 10000)
 def get_NX_subgraph(environment, frozen_set_of_nodes):
 
