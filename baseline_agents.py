@@ -1,63 +1,124 @@
-class RandomAgent():
-  """RandomAgent() chooses an action at random. The agent is not deterministic."""
-  
-  def __init__(self, environment):
-    super().__init__()
-    
-    self.environment = environment
-    self.is_trainable = False # useful to manage control flow during simulations
+import random
+from copy import deepcopy
 
-  def choose_action(self):
 
-    available_actions = self.environment.get_actions(self.environment.visited)
-    action = random.choice(available_actions)
+class RandomAgent:
+    """
+    RandomAgent chooses an action at random. The agent is not deterministic.
+    """
 
-    return action
+    def __init__(self):
+        super().__init__()
 
-class HighestDegreeAgent():
-  """HighestDegreeAgent() chooses the action with the highest node degree. The 
-  agent is deterministic."""
+        self.environments = None  # instance of MultipleEnvironments() class
+        self.is_trainable = False  # useful to manage control flow during simulations
 
-  def __init__(self, environment):
-    super().__init__()
+    def choose_action(self):
 
-    self.environment = environment
-    self.is_trainable = False # useful to manage control flow during simulations
+        if not self.environments:
+            assert False, "Supply environment(s) for the agent to interact with."
 
-  def choose_action(self):
+        actions = []
 
-    available_actions = self.environment.get_actions(self.environment.visited)
-    all_degrees = list(zip(*(self.environment.graph_NX.degree(available_actions))))[1]
-    action_idx = all_degrees.index(max(all_degrees)) # first largest when ties
-    action = available_actions[action_idx]
+        for environment in self.environments.environments:
+            available_actions = environment.get_actions(environment.visited)
+            action = random.choice(available_actions)
+            actions.append(action)
 
-    return action
+        return actions
 
-class GreedyAgent():
-  """GreedyAgent() chooses the action that would result in the greatest reward.
-  The agent uses a copy of the environment to simulate each available action and 
-  returns the best performing action. The agent is deterministic."""
 
-  def __init__(self, environment):
-    super().__init__()
+class HighestDegreeAgent:
+    """
+    HighestDegreeAgent() chooses the action with the highest node degree. The
+    agent is deterministic.
+    """
 
-    self.environment = environment
-    self.is_trainable = False # useful to manage control flow during simulations
+    def __init__(self):
+        super().__init__()
 
-  def choose_action(self):
+        self.environments = None  # instance of MultipleEnvironments() class
+        self.is_trainable = False  # useful to manage control flow during simulations
 
-    available_actions = self.environment.get_actions(self.environment.visited)
+    def choose_action(self):
 
-    best_reward = float('-inf')
-    best_action = None
+        if not self.environments:
+            assert False, "Supply environment(s) for the agent to interact with."
 
-    for action in available_actions:
+        actions = []
 
-      environment_copy = deepcopy(self.environment)
-      state_dict, reward, terminal, info = environment_copy.step(action)
+        for environment in self.environments.environments:
+            available_actions = environment.get_actions(environment.visited)
+            all_degrees = list(zip(*(environment.graph_NX.degree(available_actions))))[1]
+            action_idx = all_degrees.index(max(all_degrees))  # first largest when ties
+            action = available_actions[action_idx]
+            actions.append(action)
 
-      if reward > best_reward:
-        best_reward = reward
-        best_action = action
+        return actions
 
-    return best_action
+
+class LowestDegreeAgent:
+    """
+    LowestDegreeAgent() chooses the action with the lowest node degree. The
+    agent is deterministic.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        self.environments = None  # instance of MultipleEnvironments class
+        self.is_trainable = False  # useful to manage control flow during simulations
+
+    def choose_action(self):
+
+        if not self.environments:
+            assert False, "Supply environment(s) for the agent to interact with."
+
+        actions = []
+
+        for environment in self.environments.environments:
+            available_actions = environment.get_actions(environment.visited)
+            all_degrees = list(zip(*(environment.graph_NX.degree(available_actions))))[1]
+            action_idx = all_degrees.index(min(all_degrees))  # first smallest when ties
+            action = available_actions[action_idx]
+            actions.append(action)
+
+        return actions
+
+
+class GreedyAgent:
+    """
+    GreedyAgent() chooses the action that would result in the greatest reward.
+    The agent uses a copy of the environment to simulate each available action and
+    returns the best performing action. The agent is deterministic.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        self.environments = None  # instance of MultipleEnvironments class
+        self.is_trainable = False  # useful to manage control flow during simulations
+
+    def choose_action(self):
+
+        if not self.environments:
+            assert False, "Supply environment(s) for the agent to interact with."
+
+        actions = []
+
+        for environment in self.environments.environments:
+            available_actions = environment.get_actions(environment.visited)
+            best_reward = float('-inf')
+            best_action = None
+
+            for action in available_actions:
+                environment_copy = deepcopy(environment)
+                state_dict, reward, terminal, info = environment_copy.step(action)
+
+                if reward > best_reward:
+                    best_reward = reward
+                    best_action = action
+
+            actions.append(best_action)
+
+        return actions
