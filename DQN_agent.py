@@ -100,8 +100,8 @@ class DQNAgent:
 
     def choose_action(self):
         """
-    Choose an action to perform for each environment in self.environments.
-    """
+        Choose an action to perform for each environment in self.environments.
+        """
 
         if not self.environments:
             assert False, "Supply environment(s) for the agent to interact with."

@@ -1,11 +1,75 @@
-import torch
+import os
+import glob
 import torch.nn as nn
 from torch_geometric.nn import SAGEConv
 import numpy as np
-from copy import deepcopy
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import networkx as nx
+from graph_environment import *
+
+
+def get_hyperparameters():
+
+    hyperparameters = {'num_node_features': 5,
+                       'GNN_latent_dimensions': 64,
+                       'embedding_dimensions': 64,
+                       'QN_latent_dimensions': 32,
+                       'buffer_size': 500000,
+                       'train_start': 320,
+                       'batch_size': 32,
+                       'learn_every': 16,
+                       'epsilon_initial': 1,
+                       'epsilon_min': 0.1,
+                       'discount_factor': 0.75,
+                       'learning_rate': 3e-4}
+
+    return hyperparameters
+
+
+def load_environments(base_path, network_type, generator_type, feature):
+
+    # build training environments
+    mode = 'Train'
+    full_path = os.path.join(base_path, network_type, generator_type, mode)
+    all_train_net_paths = glob.glob(full_path + '/*.gml')
+
+    train_environments = []
+    for idx, net_path in enumerate(all_train_net_paths):
+        G = nx.read_gml(net_path, destringizer=int)
+        G = node_featurizer(G)
+        environment = GraphEnvironment(idx, G, feature)
+        train_environments.append(environment)
+
+    train_environments = MultipleEnvironments(train_environments)
+
+    # build validation environments
+    mode = 'Val'
+    full_path = os.path.join(base_path, network_type, generator_type, mode)
+    all_val_net_paths = glob.glob(full_path + '/*.gml')
+
+    val_environments = []
+    for idx, net_path in enumerate(all_val_net_paths):
+        G = nx.read_gml(net_path, destringizer=int)
+        G = node_featurizer(G)
+        environment = GraphEnvironment(idx, G, feature)
+        val_environments.append(environment)
+
+    val_environments = MultipleEnvironments(val_environments)
+
+    # build test environments
+    mode = 'Test'
+    full_path = os.path.join(base_path, network_type, generator_type, mode)
+    all_test_net_paths = glob.glob(full_path + '/*.gml')
+
+    test_environments = []
+    for idx, net_path in enumerate(all_test_net_paths):
+        G = nx.read_gml(net_path, destringizer=int)
+        G = node_featurizer(G)
+        environment = GraphEnvironment(idx, G, feature)
+        test_environments.append(environment)
+
+    test_environments = MultipleEnvironments(test_environments)
+
+    return train_environments, val_environments, test_environments
 
 
 def initialize_weights(m):
@@ -146,7 +210,6 @@ def node_featurizer(graph_NX):
 
 
 def node_defeaturizer(graph_NX):
-
     graph_NX = deepcopy(graph_NX)
 
     for (n, d) in graph_NX.nodes(data=True):
@@ -222,7 +285,6 @@ def save_checkpoint(embedding_module, q_net,
                     validation_scores, feature_values_val,
                     step,
                     save_path):
-
     save_dict = {'embedding_module_state_dict': embedding_module.state_dict(),
                  'q_net_state_dict': q_net.state_dict(),
                  'optimizer_state_dict': optimizer.state_dict(),
@@ -246,7 +308,6 @@ def save_checkpoint(embedding_module, q_net,
 def load_checkpoint(load_path, embedding_module, q_net,
                     optimizer=None,
                     replay_buffer=None):
-
     checkpoint = torch.load(load_path)
 
     embedding_module.load_state_dict(checkpoint['embedding_module_state_dict'])

@@ -10,7 +10,7 @@ class RandomAgent:
     def __init__(self):
         super().__init__()
 
-        self.environments = None  # instance of MultipleEnvironments() class
+        self.environments = None  # instance of MultipleEnvironments class
         self.is_trainable = False  # useful to manage control flow during simulations
 
     def choose_action(self):
@@ -30,14 +30,14 @@ class RandomAgent:
 
 class HighestDegreeAgent:
     """
-    HighestDegreeAgent() chooses the action with the highest node degree. The
+    HighestDegreeAgent chooses the action with the highest node degree. The
     agent is deterministic.
     """
 
     def __init__(self):
         super().__init__()
 
-        self.environments = None  # instance of MultipleEnvironments() class
+        self.environments = None  # instance of MultipleEnvironments class
         self.is_trainable = False  # useful to manage control flow during simulations
 
     def choose_action(self):
@@ -59,7 +59,7 @@ class HighestDegreeAgent:
 
 class LowestDegreeAgent:
     """
-    LowestDegreeAgent() chooses the action with the lowest node degree. The
+    LowestDegreeAgent chooses the action with the lowest node degree. The
     agent is deterministic.
     """
 
@@ -88,7 +88,7 @@ class LowestDegreeAgent:
 
 class GreedyAgent:
     """
-    GreedyAgent() chooses the action that would result in the greatest reward.
+    GreedyAgent chooses the action that would result in the greatest reward.
     The agent uses a copy of the environment to simulate each available action and
     returns the best performing action. The agent is deterministic.
     """
