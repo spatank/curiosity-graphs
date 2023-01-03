@@ -5,6 +5,11 @@ __pycache__/
 
 .DS_Store
 
+Baselines/
+Environments/
+Old Notebooks/
+KNOT/
+
 # PyCharm
 .idea
 
