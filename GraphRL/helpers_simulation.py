@@ -1,8 +1,8 @@
+import os
 from copy import deepcopy
 from tqdm import tqdm
-import os
-from helpers_miscellaneous import average_area_under_the_curve
-from helpers_miscellaneous import save_checkpoint
+from GraphRL.helpers_miscellaneous import average_area_under_the_curve
+from GraphRL.helpers_miscellaneous import save_checkpoint
 
 
 def simulate(agent, environments, num_episodes=100, verbose=True):

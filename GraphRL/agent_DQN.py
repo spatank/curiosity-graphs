@@ -1,13 +1,13 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch_geometric
 from torch_geometric.data import Batch
 from torch_geometric.nn import SAGEConv
-import numpy as np
 from copy import deepcopy
-from environments import get_PyG_subgraph
-from helpers_miscellaneous import copy_parameters_from_to
+from GraphRL.environment import get_PyG_subgraph
+from GraphRL.helpers_miscellaneous import copy_parameters_from_to
 
 
 class GNN(nn.Module):

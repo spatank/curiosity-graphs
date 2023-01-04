@@ -1,11 +1,11 @@
+import networkx as nx
 import numpy as np
 from numpy import inf, ix_
-import itertools
-from ripser import ripser
-import networkx as nx
 import matplotlib.pyplot as plt
+import itertools
 import copy
 import random
+from ripser import ripser
 
 
 def make_filtration_matrix(G):
@@ -89,14 +89,11 @@ def plot_bettis(bettis):
     plt.legend()
 
 
-TOL = 1E-8
-
-
 def repmat(M, m, n):
     return np.transpose(np.matlib.repmat(np.array([M]), m, n))
 
 
-def rate_distortion_upper_info(G, setting=1):
+def rate_distortion_upper_info(G, setting=1, TOL=1E-8):
     assert setting == 1, "Only setting 1 available."
     assert np.all(np.abs(G - G.T) < TOL), "Network must be symmetric."
 

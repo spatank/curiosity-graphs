@@ -1,12 +1,25 @@
+import os
+import numpy as np
 import torch  # get version using torch.__version__ for PyG wheels
 import torch.nn as nn
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import random
 import networkx as nx
 from copy import deepcopy
 from torch_geometric.nn import SAGEConv
+
+
+def create_save_folder(folder_path):
+
+    if not os.path.isdir(folder_path):
+        os.makedirs(folder_path)
+        print('Created folder:', folder_path)
+
+    else:
+        print('Folder exists. ')
+
+    return
 
 
 def initialize_weights(m):

@@ -3,6 +3,7 @@ import random
 import matplotlib.pyplot as plt
 import networkx as nx
 from torch_geometric import utils
+from GraphRL.helpers_miscellaneous import node_featurizer, node_defeaturizer
 
 
 @lru_cache(maxsize=100000)
@@ -169,3 +170,24 @@ class MultipleEnvironments:
 
     def __len__(self):
         return self.num_environments
+
+
+def build_environments(network_data, feature_mode, steps_per_episode, reward_function):
+    """
+  Build graph environments from network_data. Node features can be local degree profile ('LDP'),
+  'random', or 'constant'.
+  """
+    graphs = []
+    environments = []
+
+    for idx in range(len(network_data)):
+        base_G = nx.node_link_graph(network_data[str(idx)])
+        base_G = node_defeaturizer(base_G)
+        graphs.append(base_G)
+        G = node_featurizer(base_G, mode=feature_mode)
+        environment = GraphEnvironment(idx, G, steps_per_episode, reward_function)
+        environments.append(environment)
+
+    environments = MultipleEnvironments(environments)
+
+    return environments
