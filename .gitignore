@@ -7,9 +7,9 @@ __pycache__/
 
 Baselines/
 Environments/
+KNOT/
 Notebooks/
 Old Notebooks/
-KNOT/
 
 # PyCharm
 .idea
