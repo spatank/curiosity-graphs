@@ -6,34 +6,19 @@ from GraphRL.helpers_simulation import simulate, learn_environments
 from GraphRL.helpers_miscellaneous import *
 
 
-def get_hyperparameters():
-
-    parameters = {'num_node_features': 5,
-                  'GNN_latent_dimensions': 64,
-                  'embedding_dimensions': 64,
-                  'QN_latent_dimensions': 32,
-                  'buffer_size': 500000,
-                  'train_start': 320,
-                  'batch_size': 32,
-                  'learn_every': 16,
-                  'epsilon_initial': 1,
-                  'epsilon_min': 0.1,
-                  'discount_factor': 0.75,
-                  'learning_rate': 3e-4}
-
-    return parameters
-
-
 if __name__ == '__main__':
 
-    run = 'pipe_test_2'  # for filenames during saving of results
-    network_type = 'wikipedia'  # wikipedia, synthetic_ER, synthetic_BA
-    size = 'small'  # size of dataset
+    run = 'synth_ER_med_betti'  # for filenames during saving of results
+    network_type = 'synthetic_ER'  # wikipedia, synthetic_ER, synthetic_BA
+    size = 'medium'  # size of dataset
     reward_function = betti_numbers  # nx.average_clustering, betti_numbers, compressibility
 
+    num_train_steps = 50000  # number of steps in each environment; ideally 50000
+    val_every = 1000  # validate performance every val_every steps and save model
+
     base_path = '/Users/sppatankar/Developer/GraphRL/'
-    save_folder_path = base_path + 'Runs/' + network_type + '_' + size + '_' + reward_function.__name__ + '_run_' + run
-    create_save_folder(save_folder_path)
+    run_path = base_path + 'Runs/' + network_type + '_' + size + '_' + reward_function.__name__ + '_run_' + run
+    create_save_folder(run_path)
 
     data_load_path = os.path.join(base_path, 'Environments', network_type + '_' + size + '.json')
     with open(data_load_path, 'r') as f:
@@ -50,7 +35,7 @@ if __name__ == '__main__':
     val_environments = build_environments(val_data, feature_mode, steps_per_episode, reward_function)
     test_environments = build_environments(test_data, feature_mode, steps_per_episode, reward_function)
 
-    log = {'run': run, 'network_type': network_type, 'size': size, 'reward_fcn': reward_function.__name__}
+    log = {'run': run, 'network_type': network_type, 'size': size, 'reward_function': reward_function.__name__}
 
     hyperparameters = get_hyperparameters()
     embedding_module = GNN(hyperparameters)
@@ -65,9 +50,6 @@ if __name__ == '__main__':
     all_feature_values = simulate(agent, train_environments, num_episodes=100)
     feature_values_mean_DQN_before = np.mean(np.mean(np.array(all_feature_values), axis=0), axis=0)
     log['before_training'] = all_feature_values
-
-    num_train_steps = 2500  # number of steps in each environment; ideally 50000
-    val_every = 1000  # validate performance every val_every steps and save model
 
     epsilon = hyperparameters['epsilon_initial']
     epsilon_min = hyperparameters['epsilon_min']
@@ -95,7 +77,7 @@ if __name__ == '__main__':
                                             num_train_steps,
                                             discount_factor,
                                             val_every,
-                                            save_folder_path)
+                                            run_path)
 
     log['train_log'] = train_log
     log['val_log'] = val_log
@@ -106,8 +88,7 @@ if __name__ == '__main__':
     plt.plot(np.mean(np.array(train_log['returns']), axis=0), label='LDP')
     plt.legend()
     filename = 'avg_return_training.eps'
-    save_path = os.path.join(save_folder_path, filename)
-    plt.savefig(save_path, format='eps')
+    plt.savefig(os.path.join(run_path, filename), format='eps')
 
     plt.figure()
     plt.xlabel('Step')
@@ -115,7 +96,7 @@ if __name__ == '__main__':
     plt.plot(val_log['validation_steps'], val_log['validation_scores'], label='LDP')
     plt.legend()
     filename = 'val_score_training.eps'
-    plt.savefig(os.path.join(save_folder_path, filename), format='eps')
+    plt.savefig(os.path.join(run_path, filename), format='eps')
 
     # simulate agent in training environments after training
     agent = DQNAgent(embedding_module, q_net,
@@ -135,9 +116,9 @@ if __name__ == '__main__':
     plt.plot(feature_values_mean_DQN_after, label='after')
     plt.legend()
     filename = 'training_performance.eps'
-    plt.savefig(os.path.join(save_folder_path, filename), format='eps')
+    plt.savefig(os.path.join(run_path, filename), format='eps')
 
-    save_filename = os.path.join(save_folder_path, 'log.json')
+    save_filename = os.path.join(run_path, 'log.json')
 
     with open(save_filename, 'w') as f:
         json.dump(log, f)

@@ -10,8 +10,24 @@ from copy import deepcopy
 from torch_geometric.nn import SAGEConv
 
 
-def create_save_folder(folder_path):
+def get_hyperparameters():
+    parameters = {'num_node_features': 5,
+                  'GNN_latent_dimensions': 64,
+                  'embedding_dimensions': 64,
+                  'QN_latent_dimensions': 32,
+                  'buffer_size': 500000,
+                  'train_start': 320,
+                  'batch_size': 32,
+                  'learn_every': 16,
+                  'epsilon_initial': 1,
+                  'epsilon_min': 0.1,
+                  'discount_factor': 0.75,
+                  'learning_rate': 3e-4}
 
+    return parameters
+
+
+def create_save_folder(folder_path):
     if not os.path.isdir(folder_path):
         os.makedirs(folder_path)
         print('Created folder:', folder_path)
