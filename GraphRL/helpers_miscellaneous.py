@@ -259,65 +259,27 @@ class ReplayBuffer:
 
 
 def save_checkpoint(embedding_module, q_net,
-                    optimizer,
-                    replay_buffer,
-                    returns, feature_values_train,
-                    validation_steps, validation_scores, feature_values_val,
+                    validation_steps, validation_scores,
                     step,
                     save_path):
+
     save_dict = {'embedding_module_state_dict': embedding_module.state_dict(),
                  'q_net_state_dict': q_net.state_dict(),
-                 'optimizer_state_dict': optimizer.state_dict(),
-                 'buffer_ptr': replay_buffer.ptr,
-                 'buffer_num_experience': replay_buffer.num_experiences,
-                 'buffer_states': replay_buffer.states,
-                 'buffer_actions': replay_buffer.actions,
-                 'buffer_next_states': replay_buffer.next_states,
-                 'buffer_rewards': replay_buffer.rewards,
-                 'buffer_discounts': replay_buffer.discounts,
-                 'buffer_all_info': replay_buffer.all_info,
-                 'returns': returns,
-                 'feature_values_train': feature_values_train,
                  'validation_steps': validation_steps,
                  'validation_scores': validation_scores,
-                 'feature_values_val': feature_values_val,
                  'step': step}
 
     torch.save(save_dict, save_path)
 
 
-def load_checkpoint(load_path, embedding_module, q_net,
-                    optimizer=None,
-                    replay_buffer=None):
+def load_checkpoint(load_path, embedding_module, q_net):
+
     checkpoint = torch.load(load_path)
 
     embedding_module.load_state_dict(checkpoint['embedding_module_state_dict'])
     q_net.load_state_dict(checkpoint['q_net_state_dict'])
 
-    if optimizer:
-        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    val_log = {'validation_steps': checkpoint['validation_steps'],
+               'validation_scores': checkpoint['validation_scores']}
 
-    if replay_buffer:
-        replay_buffer.ptr = checkpoint['buffer_ptr']
-        replay_buffer.num_experiences = checkpoint['buffer_num_experience']
-        replay_buffer.states = checkpoint['buffer_states']
-        replay_buffer.actions = checkpoint['buffer_actions']
-        replay_buffer.next_states = checkpoint['buffer_next_states']
-        replay_buffer.rewards = checkpoint['buffer_rewards']
-        replay_buffer.discounts = checkpoint['buffer_discounts']
-        replay_buffer.all_info = checkpoint['buffer_all_info']
-
-    returns = checkpoint['returns']
-    feature_values_train = checkpoint['feature_values_train']
-    validation_steps = checkpoint['validation_steps']
-    validation_scores = checkpoint['validation_scores']
-    feature_values_val = checkpoint['feature_values_val']
-
-    train_log = {'returns': returns,
-                 'feature_values_train': feature_values_train}
-
-    val_log = {'validation_steps': validation_steps,
-               'validation_scores': validation_scores,
-               'feature_values_val': feature_values_val}
-
-    return train_log, val_log
+    return val_log

@@ -94,10 +94,7 @@ def learn_environments(agent, train_environments, val_environments,
                 if save_folder is not None:  # save checkpoint
                     save_path = os.path.join(save_folder, 'model_' + str(step) + '.pt')
                     save_checkpoint(agent.embedding_module, agent.q_net,
-                                    agent.optimizer,
-                                    agent.replay_buffer,
-                                    all_episode_returns_train, all_episode_feature_values_train,
-                                    val_steps, val_scores, all_episode_feature_values_val,
+                                    val_steps, val_scores,
                                     step,
                                     save_path)
 

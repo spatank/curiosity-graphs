@@ -3,14 +3,15 @@ from GraphRL.environment import build_environments
 from GraphRL.agent_DQN import GNN, QN, DQNAgent
 from GraphRL.helpers_simulation import simulate
 from GraphRL.helpers_miscellaneous import *
+from GraphRL.helpers_rewards import *
 
 
 if __name__ == '__main__':
 
     run = 'synth_ER_med_betti'
-    network_type = 'synthetic_BA'  # wikipedia, synthetic_ER, synthetic_BA
-    size = 'small'  # size of dataset
-    reward_function = nx.average_clustering  # betti_numbers, compressibility, nx.average_clustering
+    network_type = 'synthetic_ER'  # wikipedia, synthetic_ER, synthetic_BA
+    size = 'medium'  # size of dataset
+    reward_function = betti_numbers  # betti_numbers, compressibility, nx.average_clustering
 
     base_path = '/Users/sppatankar/Developer/GraphRL/'
     run_path = base_path + 'Runs/' + network_type + '_' + size + '_' + reward_function.__name__ + '_run_' + run
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     feature_values_mean_min_degree_test = np.mean(np.mean(np.array(min_degree_agent_test), axis=0), axis=0)
     feature_values_mean_greedy_test = np.mean(np.mean(np.array(greedy_agent_test), axis=0), axis=0)
 
-    # DQN_path = run_path + network_type + '_' + size + '_' + reward_function.__name__ + '_run_' + run
+    DQN_path = run_path + network_type + '_' + size + '_' + reward_function.__name__ + '_run_' + run
     DQN_filename = os.path.join(run_path, 'log.json')
 
     with open(DQN_filename, 'r') as f:

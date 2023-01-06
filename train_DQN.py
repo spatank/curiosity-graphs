@@ -8,7 +8,7 @@ from GraphRL.helpers_miscellaneous import *
 
 if __name__ == '__main__':
 
-    run = 'synth_ER_med_betti'  # for filenames during saving of results
+    run = 'synth_ER_med_betti_2'  # for filenames during saving of results
     network_type = 'synthetic_ER'  # wikipedia, synthetic_ER, synthetic_BA
     size = 'medium'  # size of dataset
     reward_function = betti_numbers  # nx.average_clustering, betti_numbers, compressibility
