@@ -1,6 +1,7 @@
 import networkx as nx
 import numpy as np
 from numpy import inf, ix_
+import numpy.matlib
 import matplotlib.pyplot as plt
 import itertools
 import copy
@@ -90,10 +91,10 @@ def plot_bettis(bettis):
 
 
 def repmat(M, m, n):
-    return np.transpose(np.matlib.repmat(np.array([M]), m, n))
+    return np.transpose(np.tile(np.array([M]), (m, n)))
 
 
-def rate_distortion_upper_info(G, setting=1, TOL=1E-8):
+def rate_distortion_upper_info(G, num_pairs=10000, setting=1, TOL=1E-8):
     assert setting == 1, "Only setting 1 available."
     assert np.all(np.abs(G - G.T) < TOL), "Network must be symmetric."
 
@@ -107,7 +108,7 @@ def rate_distortion_upper_info(G, setting=1, TOL=1E-8):
     clusters = [[] for _ in range(N)]  # clusters[n] lists the nodes in each of the n clusters
     Gs = [[] for _ in range(N)]  # Gs[n] is the joint transition probability matrix for n clusters
 
-    P_old = np.divide(G, np.transpose(np.matlib.repmat(np.array([np.sum(G, 1)]), N, 1)))
+    P_old = np.divide(G, np.transpose(np.tile(np.array([np.sum(G, 1)]), (N, 1))))
 
     # compute steady-state probabilities (works for undirected and possibly disconnected networks)
     p_ss = np.sum(G, 1) / np.sum(G)
@@ -117,7 +118,6 @@ def rate_distortion_upper_info(G, setting=1, TOL=1E-8):
     logP_old = np.log2(P_old, where=P_old > 0)
     logP_old[logP_old == -inf] = 0
     S_old = -np.sum(np.multiply(p_ss_old, np.sum(np.multiply(P_old, logP_old), 1)))
-    # P_joint = np.multiply(P_old, np.transpose(np.matlib.repmat(p_ss_old, N, 1)))
     P_low = P_old
 
     # record initial values
@@ -128,8 +128,17 @@ def rate_distortion_upper_info(G, setting=1, TOL=1E-8):
 
     for n in reversed(range(2, N)):
         pairs = np.array(list(itertools.combinations([k for k in range(1, n + 2)], 2)))
-        I = pairs[:, 0]
-        J = pairs[:, 1]
+
+        if num_pairs is None:
+            I = pairs[:, 0]
+            J = pairs[:, 1]
+        else:
+            inds = np.random.choice(pairs.shape[0], min(num_pairs, pairs.shape[0]), replace=False)
+            I = pairs[inds, 0]
+            J = pairs[inds, 1]
+
+        # I = pairs[:, 0]
+        # J = pairs[:, 1]
 
         # number of pairs
         num_pairs_temp = len(I)
@@ -236,7 +245,10 @@ def compressibility(graph_NX):
     for node in graph_NX_copy.nodes():  # add self-loops
         graph_NX_copy.add_edge(node, node)
     G = nx.to_numpy_array(graph_NX_copy)
-    S, S_low, clusters, Gs = rate_distortion_upper_info(G)
-    C = np.mean(S[-1] - S)
+    try:
+        S, S_low, clusters, Gs = rate_distortion_upper_info(G)
+        C = np.mean(S[-1] - S)
+    except ValueError:
+        C = 0
 
     return C

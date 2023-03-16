@@ -6,12 +6,12 @@ from torch_geometric import utils
 from GraphRL.helpers_miscellaneous import node_featurizer, node_defeaturizer
 
 
-@lru_cache(maxsize=100000)
+# @lru_cache(maxsize=100000)
 def get_NX_subgraph(frozen_set_of_nodes, graph_NX):
     return graph_NX.subgraph(list(frozen_set_of_nodes))
 
 
-@lru_cache(maxsize=500000)
+# @lru_cache(maxsize=500000)
 def get_PyG_subgraph(frozen_set_of_nodes, graph_NX):
     subgraph_NX = get_NX_subgraph(frozen_set_of_nodes, graph_NX)
     subgraph_PyG = utils.from_networkx(subgraph_NX, group_node_attrs=all)
@@ -19,12 +19,12 @@ def get_PyG_subgraph(frozen_set_of_nodes, graph_NX):
     return subgraph_PyG
 
 
-@lru_cache(maxsize=100000)
+# @lru_cache(maxsize=100000)
 def compute_feature_value(feature_function, graph_NX):
     return feature_function(graph_NX)
 
 
-@lru_cache(maxsize=100000)
+# @lru_cache(maxsize=100000)
 def get_neighbors(frozen_set_of_nodes, graph_NX):
     """
     Returns the neighborhood of a set of nodes.
@@ -177,13 +177,12 @@ def build_environments(network_data, feature_mode, steps_per_episode, reward_fun
   Build graph environments from network_data. Node features can be local degree profile ('LDP'),
   'random', or 'constant'.
   """
-    graphs = []
+
     environments = []
 
     for idx in range(len(network_data)):
         base_G = nx.node_link_graph(network_data[str(idx)])
         base_G = node_defeaturizer(base_G)
-        graphs.append(base_G)
         G = node_featurizer(base_G, mode=feature_mode)
         environment = GraphEnvironment(idx, G, steps_per_episode, reward_function)
         environments.append(environment)

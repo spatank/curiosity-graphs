@@ -11,11 +11,12 @@ from torch_geometric.nn import SAGEConv
 
 
 def get_hyperparameters():
+
     parameters = {'num_node_features': 5,
                   'GNN_latent_dimensions': 64,
                   'embedding_dimensions': 64,
                   'QN_latent_dimensions': 32,
-                  'buffer_size': 500000,
+                  'buffer_size': 50000,
                   'train_start': 320,
                   'batch_size': 32,
                   'learn_every': 16,
@@ -109,6 +110,7 @@ def average_area_under_the_curve(all_feature_values):
 
 
 def generate_video(plotting_dict):
+
     feature_values_random = plotting_dict['random']
     feature_values_degree = plotting_dict['degree']
     feature_values_greedy = plotting_dict['greedy']
@@ -259,27 +261,19 @@ class ReplayBuffer:
 
 
 def save_checkpoint(embedding_module, q_net,
-                    validation_steps, validation_scores,
                     step,
                     save_path):
-
     save_dict = {'embedding_module_state_dict': embedding_module.state_dict(),
                  'q_net_state_dict': q_net.state_dict(),
-                 'validation_steps': validation_steps,
-                 'validation_scores': validation_scores,
                  'step': step}
-
     torch.save(save_dict, save_path)
+
+    return
 
 
 def load_checkpoint(load_path, embedding_module, q_net):
-
     checkpoint = torch.load(load_path)
-
     embedding_module.load_state_dict(checkpoint['embedding_module_state_dict'])
     q_net.load_state_dict(checkpoint['q_net_state_dict'])
 
-    val_log = {'validation_steps': checkpoint['validation_steps'],
-               'validation_scores': checkpoint['validation_scores']}
-
-    return val_log
+    return

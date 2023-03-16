@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from copy import deepcopy
 from tqdm import tqdm
 from GraphRL.helpers_miscellaneous import average_area_under_the_curve
@@ -53,14 +54,11 @@ def learn_environments(agent, train_environments, val_environments,
 
     agent.environments = train_environments  # supply the agent with environments
 
-    # training logs
-    all_episode_returns_train = [[] for _ in range(train_environments.num_environments)]
-    all_episode_feature_values_train = [[] for _ in range(train_environments.num_environments)]
-    episode_returns_train = [0] * train_environments.num_environments
-    episode_feature_values_train = [[] for _ in range(train_environments.num_environments)]
+    # training
+    avg_returns = []
+    episode_returns = [0] * train_environments.num_environments
 
-    # validation logs
-    all_episode_feature_values_val = []
+    # validation
     if not val_environments:
         log_val_results = False
     val_steps = []
@@ -74,10 +72,7 @@ def learn_environments(agent, train_environments, val_environments,
     for step in pbar:
         actions = agent.choose_action()  # choose an action for each environment
         next_state_dicts, rewards, terminals, all_info = train_environments.step(actions)
-        episode_returns_train = [sum(x) for x in zip(rewards, episode_returns_train)]
-
-        for idx, info in enumerate(all_info):
-            episode_feature_values_train[idx].append(info['feature_value'])
+        episode_returns = [sum(x) for x in zip(rewards, episode_returns)]
 
         if agent.is_trainable:
             discounts = [discount_factor * (1 - terminal) for terminal in terminals]
@@ -89,14 +84,10 @@ def learn_environments(agent, train_environments, val_environments,
                 val_score = average_area_under_the_curve(all_feature_values_val)
                 val_steps.append(step)
                 val_scores.append(val_score)
-                all_episode_feature_values_val.append(all_feature_values_val)
 
                 if save_folder is not None:  # save checkpoint
                     save_path = os.path.join(save_folder, 'model_' + str(step) + '.pt')
-                    save_checkpoint(agent.embedding_module, agent.q_net,
-                                    val_steps, val_scores,
-                                    step,
-                                    save_path)
+                    save_checkpoint(agent.embedding_module, agent.q_net, step, save_path)
 
             if loss:
                 pbar.set_description('Loss: %0.5f, Val. Score: %0.5f' % (loss, val_score))
@@ -106,20 +97,13 @@ def learn_environments(agent, train_environments, val_environments,
 
         state_dicts = next_state_dicts
 
-        for idx, terminal in enumerate(terminals):
-            # if terminal then gather episode results for this environment and reset
-            if terminal:
-                all_episode_returns_train[idx].append(episode_returns_train[idx])
-                episode_returns_train[idx] = 0
-                all_episode_feature_values_train[idx].append(episode_feature_values_train[idx])
-                episode_feature_values_train[idx] = []
-                state_dict, terminal, info = train_environments.environments[idx].reset()
-                state_dicts[idx] = state_dict
+        if all(terminals):
+            assert all(terminals) == any(terminals), "Simulation error!"
+            state_dicts, _, _ = train_environments.reset()
+            avg_returns.append(np.mean(episode_returns))  # average across all environments
+            episode_returns = [0] * train_environments.num_environments
 
     train_environments.reset()
-
-    train_log = {'returns': all_episode_returns_train,
-                 'feature_values_train': all_episode_feature_values_train}
 
     # validate final model and save checkpoint
     all_feature_values_val = simulate(agent, val_environments,
@@ -127,20 +111,13 @@ def learn_environments(agent, train_environments, val_environments,
     val_score = average_area_under_the_curve(all_feature_values_val)
     val_steps.append(num_steps)
     val_scores.append(val_score)
-    all_episode_feature_values_val.append(all_feature_values_val)
 
     if save_folder is not None:  # save checkpoint
         save_path = os.path.join(save_folder, 'model_' + str(num_steps) + '.pt')
-        save_checkpoint(agent.embedding_module, agent.q_net,
-                        agent.optimizer,
-                        agent.replay_buffer,
-                        all_episode_returns_train, all_episode_feature_values_train,
-                        val_steps, val_scores, all_episode_feature_values_val,
-                        num_steps,
-                        save_path)
+        save_checkpoint(agent.embedding_module, agent.q_net, num_steps, save_path)
 
-    val_log = {'validation_steps': val_steps,
-               'validation_scores': val_scores,
-               'feature_values_val': all_episode_feature_values_val}
+    log = {'training_returns': avg_returns,
+           'validation_steps': val_steps,
+           'validation_scores': val_scores}
 
-    return train_log, val_log
+    return log
