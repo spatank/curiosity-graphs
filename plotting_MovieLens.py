@@ -8,11 +8,11 @@ from GraphRL.helpers_rewards import *
 
 
 if __name__ == '__main__':
-    run = '40'
-    network_type = 'MovieLens'  # wikipedia, synthetic_ER, synthetic_BA
+    run = '60'
+    network_type = 'Wikispeedia'  # wikipedia, synthetic_ER, synthetic_BA
     size = 'full'  # size of dataset
     feature_mode = 'LDP'  # random, LDP (local degree profile), or constant (= 1)
-    reward_function = compressibility  # betti_numbers, compressibility, nx.average_clustering
+    reward_function = betti_numbers  # betti_numbers, compressibility, nx.average_clustering
 
     base_path = '/Users/sppatankar/Developer/GraphRL/'
     run_path = base_path + 'Runs/' + network_type + '_' + size + '_' + \

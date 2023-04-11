@@ -8,11 +8,11 @@ from GraphRL.helpers_simulation import learn_environments
 from GraphRL.helpers_miscellaneous import *
 
 if __name__ == '__main__':
-    run = '40'  # for filenames during saving of results, always manually increment by 1
-    network_type = 'MovieLens'  # wikipedia, synthetic_ER, synthetic_BA
+    run = '60'  # for filenames during saving of results, always manually increment by 1
+    network_type = 'Wikispeedia'  # wikipedia, synthetic_ER, synthetic_BA, Wikispeedia
     size = 'full'  # size of dataset
     feature_mode = 'LDP'  # random, LDP (local degree profile), or constant (= 1)
-    reward_function = compressibility  # nx.average_clustering, betti_numbers, compressibility
+    reward_function = betti_numbers  # nx.average_clustering, betti_numbers, compressibility
 
     num_train_steps = 50000  # number of steps in each environment; ideally 50000
     val_every = 1000  # validate performance every val_every steps and save model
@@ -26,7 +26,8 @@ if __name__ == '__main__':
 
     # movies_adj_mat = np.load(os.path.join(base_path, 'MovieLens/edge_avg_50_adj.npy'))
     # movies_adj_mat = np.load(os.path.join(base_path, 'MovieLens/edge_avg_20_adj.npy'))
-    network_path = os.path.join(base_path, 'MovieLens/new_adj')
+    # network_path = os.path.join(base_path, 'MovieLens/new_adj')
+    network_path = os.path.join(base_path, 'Wikispeedia/wikispeedia_adj.pkl')
     with open(network_path, 'rb') as f:
         movies_adj_mat = pickle.load(f)
     movies_network = nx.convert_matrix.from_numpy_matrix(movies_adj_mat)

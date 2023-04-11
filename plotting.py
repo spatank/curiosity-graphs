@@ -1,5 +1,5 @@
 import json
-from GraphRL.environment import build_environments, build_wiki_environments
+from GraphRL.environment import build_environments
 from GraphRL.agent_DQN import GNN, QN, DQNAgent
 from GraphRL.helpers_simulation import simulate
 from GraphRL.helpers_miscellaneous import *
@@ -7,11 +7,11 @@ from GraphRL.helpers_rewards import *
 
 
 if __name__ == '__main__':
-    run = '13'
-    network_type = 'wikipedia'  # wikipedia, synthetic_ER, synthetic_BA
-    size = 'medium'  # size of dataset
+    run = '100'
+    network_type = 'synthetic_BA'  # wikipedia, synthetic_ER, synthetic_BA, synthetic_RG
+    size = 'large'  # size of dataset
     feature_mode = 'LDP'  # random, LDP (local degree profile), or constant (= 1)
-    reward_function = compressibility  # betti_numbers, compressibility, nx.average_clustering
+    reward_function = betti_numbers  # betti_numbers, compressibility, nx.average_clustering
 
     base_path = '/Users/sppatankar/Developer/GraphRL/'
     run_path = base_path + 'Runs/' + network_type + '_' + size + '_' + \

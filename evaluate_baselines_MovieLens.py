@@ -8,9 +8,9 @@ from GraphRL.helpers_miscellaneous import *
 
 if __name__ == '__main__':
 
-    network_type = 'MovieLens'  # wikipedia, synthetic_ER, synthetic_BA
+    network_type = 'Wikispeedia'  # wikipedia, synthetic_ER, synthetic_BA
     size = 'full'  # size of dataset
-    reward_function = nx.average_clustering  # betti_numbers, compressibility, nx.average_clustering
+    reward_function = betti_numbers  # betti_numbers, compressibility, nx.average_clustering
 
     base_path = '/Users/sppatankar/Developer/GraphRL/'
     save_path = os.path.join(base_path, 'Baselines/')
