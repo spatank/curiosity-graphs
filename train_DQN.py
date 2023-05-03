@@ -6,8 +6,13 @@ from GraphRL.helpers_simulation import learn_environments
 from GraphRL.helpers_miscellaneous import *
 
 if __name__ == '__main__':
+<<<<<<< Updated upstream
     run = '200'  # for filenames during saving of results, always manually increment by 1
     network_type = 'synthetic_RG'  # wikipedia, synthetic_ER, synthetic_BA, synthetic_RG, synthetic_WS
+=======
+    run = '81'  # for filenames during saving of results, always manually increment by 1
+    network_type = 'synthetic_WS'  # wikipedia, synthetic_ER, synthetic_BA, synthetic_RG, synthetic_WS
+>>>>>>> Stashed changes
     size = 'large'  # size of dataset
     feature_mode = 'LDP'  # random, LDP (local degree profile), or constant (= 1)
     reward_function = compressibility  # nx.average_clustering, betti_numbers, compressibility

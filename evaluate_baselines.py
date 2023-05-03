@@ -7,9 +7,9 @@ from GraphRL.helpers_miscellaneous import *
 
 if __name__ == '__main__':
 
-    network_type = 'synthetic_BA'  # wikipedia, synthetic_ER, synthetic_BA, synthetic_RG, synthetic_WS
+    network_type = 'synthetic_WS'  # wikipedia, synthetic_ER, synthetic_BA, synthetic_RG, synthetic_WS
     size = 'large'  # size of dataset
-    reward_function = betti_numbers  # betti_numbers, compressibility, nx.average_clustering
+    reward_function = compressibility  # betti_numbers, compressibility, nx.average_clustering
 
     base_path = '/Users/sppatankar/Developer/GraphRL/'
     save_path = os.path.join(base_path, 'Baselines/')
