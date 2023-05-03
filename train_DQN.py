@@ -6,16 +6,16 @@ from GraphRL.helpers_simulation import learn_environments
 from GraphRL.helpers_miscellaneous import *
 
 if __name__ == '__main__':
-    run = '110'  # for filenames during saving of results, always manually increment by 1
-    network_type = 'synthetic_ER'  # wikipedia, synthetic_ER, synthetic_BA, synthetic_RG, synthetic_WS
+    run = '200'  # for filenames during saving of results, always manually increment by 1
+    network_type = 'synthetic_RG'  # wikipedia, synthetic_ER, synthetic_BA, synthetic_RG, synthetic_WS
     size = 'large'  # size of dataset
     feature_mode = 'LDP'  # random, LDP (local degree profile), or constant (= 1)
-    reward_function = betti_numbers  # nx.average_clustering, betti_numbers, compressibility
+    reward_function = compressibility  # nx.average_clustering, betti_numbers, compressibility
 
     num_train_steps = 50000  # number of steps in each environment; ideally 50000
     val_every = 1000  # validate performance every val_every steps and save model
 
-    base_path = '/Users/sppatankar/Developer/GraphRL/'
+    base_path = '/Users/lcaciagl/Developer/GraphRL/'
     run_path = base_path + 'Runs/' + network_type + '_' + size + '_' + \
                feature_mode + '_' + reward_function.__name__ + '_run_' + run
     create_save_folder(run_path)

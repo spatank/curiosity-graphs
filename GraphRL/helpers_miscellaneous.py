@@ -5,13 +5,13 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import random
+from tqdm import tqdm
 import networkx as nx
 from copy import deepcopy
 from torch_geometric.nn import SAGEConv
 
 
 def get_hyperparameters():
-
     parameters = {'num_node_features': 5,
                   'GNN_latent_dimensions': 64,
                   'embedding_dimensions': 64,
@@ -39,9 +39,20 @@ def create_save_folder(folder_path):
     return
 
 
+def generate_networks(num_networks, generator, verbose=False, **kwargs):
+    networks = {}
+    for i in tqdm(range(num_networks), disable=not verbose):
+        graph = generator(**kwargs)
+        while not nx.is_connected(graph):
+            graph = generator(**kwargs)
+        networks[i] = nx.node_link_data(graph)
+
+    return networks
+
+
 def initialize_weights(m):
     """
-    Xavier initialization of model weights.
+    Xavier's initialization of model weights.
     """
 
     if isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d):
@@ -110,7 +121,6 @@ def average_area_under_the_curve(all_feature_values):
 
 
 def generate_video(plotting_dict):
-
     feature_values_random = plotting_dict['random']
     feature_values_degree = plotting_dict['degree']
     feature_values_greedy = plotting_dict['greedy']
@@ -127,9 +137,9 @@ def generate_video(plotting_dict):
     fig, ax = plt.subplots()
     ax.axis([0, xlim, 0, ylim + 0.01 * ylim])
 
-    line1, = ax.plot(x, feature_values_random, label='random', color='blue')
-    line2, = ax.plot(x, feature_values_degree, label='max degree', color='orange')
-    line3, = ax.plot(x, feature_values_greedy, label='greedy', color='green')
+    _, = ax.plot(x, feature_values_random, label='random', color='blue')
+    _, = ax.plot(x, feature_values_degree, label='max degree', color='orange')
+    _, = ax.plot(x, feature_values_greedy, label='greedy', color='green')
     line4, = ax.plot([], [], label='DQN', color='black')
 
     ax.legend()
@@ -277,3 +287,4 @@ def load_checkpoint(load_path, embedding_module, q_net):
     q_net.load_state_dict(checkpoint['q_net_state_dict'])
 
     return
+
