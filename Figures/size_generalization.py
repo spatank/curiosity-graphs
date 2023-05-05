@@ -7,7 +7,8 @@ from GraphRL.agents_baseline import *
 from GraphRL.agent_DQN import DQNAgent
 
 if __name__ == '__main__':
-    base_path = '/content/drive/My Drive/GraphRL_v2/Figure_3/'
+
+    base_path = '/Users/sppatankar/Developer/GraphRL/Figures/Figure_3/'
     # settings
     feature_mode = 'LDP'
     reward_function = betti_numbers
@@ -20,10 +21,14 @@ if __name__ == '__main__':
     k = 4  # (Watts-Strogatz)
     p_WS = 0.1  # (Watts-Strogatz)
     # experiment parameters
-    num_networks = 10
-    network_models = ['WS', 'ER', 'BA', 'RG']
-    all_steps_per_episode = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-    agents = ['random', 'max_degree', 'min_degree', 'greedy', 'DQN']
+    # num_networks = 10
+    num_networks = 2
+    # network_models = ['WS', 'ER', 'BA', 'RG']
+    network_models = ['WS']
+    # all_steps_per_episode = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    all_steps_per_episode = [5, 10, 15, 20]
+    # agents = ['random', 'max_degree', 'min_degree', 'greedy', 'DQN']
+    agents = ['random', 'max_degree', 'min_degree', 'DQN']
 
     all_data = {}
 

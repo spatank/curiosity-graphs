@@ -8,7 +8,7 @@ from GraphRL.helpers_rewards import *
 
 
 if __name__ == '__main__':
-    run = '60'
+    run = '61'
     network_type = 'Wikispeedia'  # wikipedia, synthetic_ER, synthetic_BA
     size = 'full'  # size of dataset
     feature_mode = 'LDP'  # random, LDP (local degree profile), or constant (= 1)
