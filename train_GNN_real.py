@@ -1,43 +1,62 @@
 import json
-from GraphRL.environment import build_environments
-from GraphRL.agent_DQN import GNN, QN, DQNAgent
+import pickle
+
+from GraphRL.environment import GraphEnvironment, MultipleEnvironments
+from GraphRL.agent_GNN import GNN, QN, DQNAgent
 from GraphRL.helpers_rewards import *
 from GraphRL.helpers_simulation import learn_environments
 from GraphRL.helpers_miscellaneous import *
 
 if __name__ == '__main__':
-
-    run = '200'  # for filenames during saving of results, always manually increment by 1
-    network_type = 'synthetic_RG'  # wikipedia, synthetic_ER, synthetic_BA, synthetic_RG, synthetic_WS
-    size = 'large'  # size of dataset
+    run = '600000'  # for filenames during saving of results, always manually increment by 1
+    network_type = 'Wikispeedia'  # wikipedia, synthetic_ER, synthetic_BA, Wikispeedia
+    size = 'full'  # size of dataset
     feature_mode = 'LDP'  # random, LDP (local degree profile), or constant (= 1)
-    reward_function = compressibility  # nx.average_clustering, betti_numbers, compressibility
+    reward_function = betti_numbers  # nx.average_clustering, betti_numbers, compressibility
 
     num_train_steps = 50000  # number of steps in each environment; ideally 50000
     val_every = 1000  # validate performance every val_every steps and save model
 
-    base_path = '/Users/lcaciagl/Developer/GraphRL/'
+    base_path = '/Users/sppatankar/Developer/GraphRL/'
     run_path = base_path + 'Runs/' + network_type + '_' + size + '_' + \
                feature_mode + '_' + reward_function.__name__ + '_run_' + run
     create_save_folder(run_path)
 
-    data_load_path = os.path.join(base_path, 'Environments', network_type + '_' + size + '.json')
-    with open(data_load_path, 'r') as f:
-        all_data = json.load(f)
-
-    train_data = all_data['train']
-    val_data = all_data['val']
-    test_data = all_data['test']
-
     steps_per_episode = 10  # steps in each episode; average KNOT session has ~9 unique node visits
 
-    train_environments = build_environments(train_data, feature_mode, steps_per_episode, reward_function)
-    val_environments = build_environments(val_data, feature_mode, steps_per_episode, reward_function)
-    test_environments = build_environments(test_data, feature_mode, steps_per_episode, reward_function)
+    # movies_adj_mat = np.load(os.path.join(base_path, 'MovieLens/edge_avg_50_adj.npy'))
+    # movies_adj_mat = np.load(os.path.join(base_path, 'MovieLens/edge_avg_20_adj.npy'))
+    # network_path = os.path.join(base_path, 'MovieLens/new_adj')
+    network_path = os.path.join(base_path, 'Wikispeedia/wikispeedia_adj.pkl')
+    with open(network_path, 'rb') as f:
+        movies_adj_mat = pickle.load(f)
+    movies_network = nx.convert_matrix.from_numpy_matrix(movies_adj_mat)
+    G = node_featurizer(movies_network, mode='LDP')
+    environments = []
+    environment = GraphEnvironment(0, G, steps_per_episode, reward_function)
+    environments.append(environment)
+    train_environments = MultipleEnvironments(environments)
+    val_environments = deepcopy(train_environments)
 
     hyperparameters = get_hyperparameters()
     embedding_module = GNN(hyperparameters)
     q_net = QN(hyperparameters)
+
+    # print('Before:', compute_Frobenius_norm(embedding_module), compute_Frobenius_norm(q_net))
+    # # Load pre-trained model:
+    # load_model_run = '17'
+    # load_model_path = base_path + 'Runs/' + network_type + '_' + size + '_' + \
+    #                   feature_mode + '_' + reward_function.__name__ + '_run_' + load_model_run
+    # with open(os.path.join(load_model_path, 'log.json'), 'r') as f:
+    #     log = json.load(f)
+    # max_index = np.argmax(log['validation_scores'])
+    # steps = log['validation_steps'][max_index]
+    # assert log['metadata']['run'] == load_model_run, 'Mismatch in run ID.'
+    # assert log['metadata']['network_type'] == network_type, 'Mismatch in network type.'
+    # assert log['metadata']['size'] == size, 'Mismatch in network size.'
+    # assert log['metadata']['reward_function'] == reward_function.__name__, 'Mismatch'
+    # load_checkpoint(os.path.join(load_model_path, 'model_' + str(steps) + '.pt'), embedding_module, q_net)
+    # print('After:', compute_Frobenius_norm(embedding_module), compute_Frobenius_norm(q_net))
 
     epsilon = hyperparameters['epsilon_initial']
     epsilon_min = hyperparameters['epsilon_min']
