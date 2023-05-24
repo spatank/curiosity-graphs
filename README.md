@@ -6,7 +6,7 @@ When sources of information have a natural graph structure, two theories of huma
 ## Code Overview
 
 The 'GraphRL/' folder contains the following files:
-1. 'environment.py': defines a graph environment and handles agent-environment interactions during simulations.
+1. *environment.py*: defines a graph environment and handles agent-environment interactions during simulations.
 2. 'agents_baseline.py': implements the maximum degree, minimum degree and random baseline agents.
 3. 'agent_GNN.py': implements the GNN agents.
 4. 'helpers_simulation.py': contains code to simulate the agent-environment interaction and a function consisting of the training loop.
