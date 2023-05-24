@@ -16,11 +16,11 @@ The 'GraphRL/' folder contains the following files:
 ### Training for Synthetic Environments
 1. Build synthetic graph environments using the notebook located at 'Notebooks/data_processing_synthetic.ipynb.' Generated networks are placed inside the 'Environments/' folder.
 2. In 'train_GNN_synthetic.py', specify the parameters for the training process:
-      a) run: creates a folder in 'Runs/' to store training and validation curves and model checkpoints specific to the current training run.
-      b) network_type: specify the model used to build synthetic graph environments; 'synthetic_ER', 'synthetic_BA', 'synthetic_RG', or 'synthetic_WS'.
-      c) size: specify the size of the training, validation, and testing datasets; options include 'mini', 'small', 'medium', or 'large'; note that the datasets must first be created according to Step 1.
-      d) feature_mode: specify the node attributes; we use the local degree profile, 'LDP', for each node; options include 'random' and 'constant'.
-      e) reward_function: specify which exploration objective the GNN is being trained for, 'betti_numbers' for IGT and 'compressibility' for CPT; any function handle that accepts a network as input and outputs a scalar is a valid specification.
+      1. run: creates a folder in 'Runs/' to store training and validation curves and model checkpoints specific to the current training run.
+      2. network_type: specify the model used to build synthetic graph environments; 'synthetic_ER', 'synthetic_BA', 'synthetic_RG', or 'synthetic_WS'.
+      3. size: specify the size of the training, validation, and testing datasets; options include 'mini', 'small', 'medium', or 'large'; note that the datasets must first be created according to Step 1.
+      4. feature_mode: specify the node attributes; we use the local degree profile, 'LDP', for each node; options include 'random' and 'constant'.
+      5. reward_function: specify which exploration objective the GNN is being trained for, 'betti_numbers' for IGT and 'compressibility' for CPT; any function handle that accepts a network as input and outputs a scalar is a valid specification.
 3. After defining the above parameters, a complete training run can be accomplished by running the 'train_GNN.py' script.
 
 We use the DQN algorithm with a replay buffer and a target network to train the GNNs. Hyperparameters for training can be altered inside the 'GraphRL/helpers_miscellaneous.py' file. Algorithmic details about the training process are outlined in the 'Supplement.pdf' file in this submission. 
