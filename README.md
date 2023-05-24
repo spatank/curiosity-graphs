@@ -36,3 +36,6 @@ Real-world graph datasets can be used as environments for training and testing. 
 
 ### Personalized Curiosity-Based Centrality
 Self-contained notebooks to compute curiosity-based centrality results for each of the three real-world graph datasets studied in the Main manuscript are included in corresponding folder.
+
+### Experiment Notebooks
+We include files inside the *Notebooks/* folder that were used for the trajectory and environment size generalization experiments as well as to produce the summarized results for Table 1.
